@@ -1,5 +1,11 @@
 # UTC 502 - Principes fondamentaux des Systèmes d'exploitation
 
+Compile C code to run with thread safety handling
+
+```sh
+gcc multithreading3.c -o multithreading3 -lpthread
+```
+
 # Multi-threading
 
 This section covers multi-threading concepts in C using the pthread library.

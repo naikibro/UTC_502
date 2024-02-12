@@ -2,6 +2,8 @@
 #include <stdlib.h>
 #include <pthread.h>
 #include <unistd.h>
+#include <sys/wait.h>
+#include <sys/types.h>
 
 pthread_mutex_t mutex;  // Mutex pour protéger l'accès au plat
 int plat = 10;           // Plat à servir
