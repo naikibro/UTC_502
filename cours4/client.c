@@ -9,7 +9,6 @@
 
 #define BUFLEN 512
 #define NPACK 10
-#define PATH "/tmp/mon_socket"
 
 int main()
 {
@@ -22,13 +21,6 @@ int main()
     server_addr.sin_family = AF_INET;                     // Changed from AF_UNIX to AF_INET for using IP addresses
     server_addr.sin_addr.s_addr = inet_addr("127.0.0.1"); // Set the IP address to 127.0.0.1
     server_addr.sin_port = htons(8080);                   // Set the port number to 8080
-
-    // Removes the existing socket file if it exists
-    if (!unlink(PATH))
-    {
-        // Prints a message indicating that the existing socket file was removed
-        printf("Removed existing socket: %s\n", PATH);
-    }
 
     printf("\nWaiting...");
 
