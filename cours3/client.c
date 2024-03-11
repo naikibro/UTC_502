@@ -1,45 +1,49 @@
+// client.c
 #include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
+#include <unistd.h>
 #include <sys/types.h>
 #include <sys/socket.h>
-#include <netinet/in.h>
-#include <netdb.h>
-#include <unistd.h>
+#include <sys/un.h>
 
-#define PORT 12345
-#define MAX_MSG_SIZE 1024
-#define NUM_MESSAGES 10
+#define BUFLEN 512
+#define NPACK 10
+#define PATH "/tmp/mon_socket"
 
-int main() {
-    int sockfd, n;
-    struct sockaddr_in serv_addr;
-    struct hostent *server;
+int main()
+{
+    int sockfd = socket(AF_UNIX, SOCK_DGRAM, 0);
+    int i = 0;
+    struct sockaddr_un server_addr;
+    char buf[BUFLEN];
 
-    char buffer[MAX_MSG_SIZE];
+    // Creating the server address
+    server_addr.sun_family = AF_UNIX;
+    strcpy(server_addr.sun_path, "/tmp/mon_socket");
 
-    // Create socket
-    sockfd = socket(AF_INET, SOCK_STREAM, 0);
-
-    // Get server address
-    server = gethostbyname("localhost");
-
-    // Initialize socket structure
-    bzero((char *) &serv_addr, sizeof(serv_addr));
-    serv_addr.sin_family = AF_INET;
-    bcopy((char *)server->h_addr, (char *)&serv_addr.sin_addr.s_addr, server->h_length);
-    serv_addr.sin_port = htons(PORT);
-
-    // Connect to server
-    connect(sockfd, (struct sockaddr *) &serv_addr, sizeof(serv_addr));
-
-    // Send messages to server
-    for (int i = 0; i < NUM_MESSAGES; ++i) {
-        snprintf(buffer, MAX_MSG_SIZE, "Message %d from client", i + 1);
-        n = write(sockfd, buffer, strlen(buffer));
+    // Removes the existing socket file if it exists
+    if (!unlink(PATH))
+    {
+        // Prints a message indicating that the existing socket file was removed
+        printf("Removed existing socket: %s\n", PATH);
     }
 
-    // Close socket
+    printf("\nWaiting...");
+
+    // Binds the socket to the server address
+    if (bind(sockfd, (struct sockaddr *)&server_addr, sizeof(server_addr)) < 0)
+    {
+        perror("Error binding socket");
+        return 1;
+    }
+
+    for (i = 0; i < NPACK; i++)
+    {
+        // Receives a message from the server and stores it in the buffer 'buf'
+        recv(sockfd, buf, BUFLEN, 0);
+        printf("Message received: %s\n", buf);
+    }
+
     close(sockfd);
+
     return 0;
 }

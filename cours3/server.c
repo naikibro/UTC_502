@@ -1,49 +1,37 @@
+// This is a simple client-server communication setup using Unix domain sockets.
+// The server sends messages to the client, and the client receives and prints them.
+
+// server.c
 #include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
+#include <unistd.h>
 #include <sys/types.h>
 #include <sys/socket.h>
-#include <netinet/in.h>
-#include <unistd.h>
+#include <sys/un.h>
 
-#define PORT 12345
-#define MAX_MSG_SIZE 1024
-#define NUM_MESSAGES 10
+#define BUFLEN 512
+#define NPACK 10
 
-int main() {
-    int sockfd, newsockfd, clilen;
-    struct sockaddr_in serv_addr, cli_addr;
-    int n;
-    char buffer[MAX_MSG_SIZE];
+int main()
+{
+   int sockfd = socket(AF_UNIX, SOCK_DGRAM, 0);
+   int i = 0;
+   struct sockaddr_un server_addr;
+   char buf[BUFLEN];
 
-    // Create socket
-    sockfd = socket(AF_INET, SOCK_STREAM, 0);
+   // Creating the server address
+   server_addr.sun_family = AF_UNIX;
+   strcpy(server_addr.sun_path, "/tmp/mon_socket");
 
-    // Initialize socket structure
-    bzero((char *) &serv_addr, sizeof(serv_addr));
-    serv_addr.sin_family = AF_INET;
-    serv_addr.sin_addr.s_addr = INADDR_ANY;
-    serv_addr.sin_port = htons(PORT);
+   for (i = 0; i < NPACK; i++)
+   {
+      printf("Message sent\n");
+      sprintf(buf, "Message #%d", i + 1);
 
-    // Bind the host address
-    bind(sockfd, (struct sockaddr *) &serv_addr, sizeof(serv_addr));
+      // Sends the message in 'buf' to the server address
+      sendto(sockfd, buf, strlen(buf), 0, (struct sockaddr *)&server_addr, sizeof(server_addr));
+   }
 
-    // Start listening for the clients
-    listen(sockfd, 5);
-    clilen = sizeof(cli_addr);
+   close(sockfd);
 
-    // Accept connection from client
-    newsockfd = accept(sockfd, (struct sockaddr *) &cli_addr, &clilen);
-
-    // Receive messages and print them
-    for (int i = 0; i < NUM_MESSAGES; ++i) {
-        bzero(buffer, MAX_MSG_SIZE);
-        n = read(newsockfd, buffer, MAX_MSG_SIZE - 1);
-        printf("Message from client: %s\n", buffer);
-    }
-
-    // Close sockets
-    close(newsockfd);
-    close(sockfd);
-    return 0;
+   return 0;
 }
