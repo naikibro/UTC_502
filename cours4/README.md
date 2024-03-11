@@ -1,4 +1,4 @@
-# Unix Domain Socket Communication
+# Internet Socket Communication
 
 ## Description
 
@@ -7,12 +7,12 @@ This project consists of two C programs, `server.c` and `client.c`, that demonst
 ## Tools Used
 
 - C programming language
-- Unix domain sockets
+- Unix Internet domain sockets
 
 ## File Descriptions
 
-- `server.c`: Sends messages to the client using Unix domain sockets. Utilizes `socket`, `sendto`, and `close` functions. The `socket` function creates a socket, `sendto` sends messages, and `close` closes the socket.
-- `client.c`: Receives messages from the server using Unix domain sockets. Utilizes `socket`, `bind`, `recv`, and `close` functions. The `socket` function creates a socket, `bind` binds the socket to an address, `recv` receives messages, and `close` closes the socket.
+- `server.c`: Sends messages to the client using Internet domain sockets. Utilizes `socket`, `sendto`, and `close` functions. The `socket` function creates a socket, `sendto` sends messages, and `close` closes the socket.
+- `client.c`: Receives messages from the server using Internet domain sockets. Utilizes `socket`, `bind`, `recv`, and `close` functions. The `socket` function creates a socket, `bind` binds the socket to an address, `recv` receives messages, and `close` closes the socket.
 
 ## Function Descriptions
 
